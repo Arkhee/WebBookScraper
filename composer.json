@@ -20,6 +20,11 @@
     "ext-tidy": "Clean up HTML content",
     "ext-curl": "Read remote content"
   },
+  "autoload": {
+    "psr-4": {
+      "WebBookScraper\\": "src/"
+    }
+  },
   "archive": {
     "exclude": [
       "/test",
