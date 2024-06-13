@@ -40,7 +40,7 @@ class Scraper
         $headers = $article->getElementsByTagName('header');
         $chapitre = '';
         if ($headers->length > 0) {
-            $chapitre = $dom->saveHTML($headers->item(0));
+            $chapitre = trim($headers->item(0)->nodeValue);
         }
 
         // Supprimer les balises div qui ont la classe wp-dark-mode-switch
