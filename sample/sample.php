@@ -36,5 +36,5 @@ if(isset($_POST["url"]))
     echo "</ul>\r\n";
     echo "Premier chapitre : <br />\r\n";
     echo "<h2>".$book->chapters[0]->title."</h2>\r\n";
-    echo "<pre>".$book->chapters[0]->content."</pre>\r\n";
+    echo "<div class='content'>".$book->chapters[0]->content."</div>\r\n";
 }
