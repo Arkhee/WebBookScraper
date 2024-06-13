@@ -1,6 +1,6 @@
 <?php
-namespace Arkhee\WebBookScraper;
-use Arkhee\WebBookScraper\StructToc;
+namespace WebBookScraper;
+use WebBookScraper\StructToc;
 class StructCover
 {
     public $title = "";

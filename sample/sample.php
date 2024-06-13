@@ -5,7 +5,7 @@ require_once("../src/StructChapter.php");
 require_once("../src/StructCover.php");
 require_once("../src/StructToc.php");
 require_once("../src/WebBookScraper.php");
-use Arkhee\WebBookScraper\WebBookScraper;
+use WebBookScraper\WebBookScraper;
 ?>
 <html lang="en-EN">
 <head>

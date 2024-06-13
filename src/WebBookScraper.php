@@ -1,6 +1,6 @@
 <?php
-namespace Arkhee\WebBookScraper;
-use Arkhee\WebBookScraper\Scraper;
+namespace WebBookScraper;
+use WebBookScraper\Scraper;
 class WebBookScraper
 {
     private $url = "";

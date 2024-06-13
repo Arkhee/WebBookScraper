@@ -1,7 +1,7 @@
 <?php
-namespace Arkhee\WebBookScraper;
-use Arkhee\WebBookScraper\StructChapter;
-use Arkhee\WebBookScraper\StructCover;
+namespace WebBookScraper;
+use WebBookScraper\StructChapter;
+use WebBookScraper\StructCover;
 class Scraper
 {
     public static function Toc($url):StructCover

@@ -1,5 +1,5 @@
 <?php
-namespace Arkhee\WebBookScraper;
+namespace WebBookScraper;
 class StructChapter
 {
     public $title = "";
