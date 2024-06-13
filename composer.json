@@ -14,6 +14,12 @@
       "role": "Maintainer"
     }
   ],
+  "suggest": {
+    "ext-dom": "Manage HTML Dom content",
+    "ext-libxml": "Handle xHtml files",
+    "ext-tidy": "Clean up HTML content",
+    "ext-curl": "Read remote content"
+  },
   "archive": {
     "exclude": [
       "/test",

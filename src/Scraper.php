@@ -125,7 +125,7 @@ class Scraper
         $toc = new StructCover();
         // Extraction du contenu de la balise "header" contenue dans l'article
         $headerNode = $xpath->query('//article//header')->item(0);
-        $toc->title = $headerNode ?? '';
+        $toc->title = trim($headerNode->nodeValue) ;
 
         // Récupération de tous les liens dans le contenu "entry-content"
         $links = $xpath->query('//div[contains(@class, "entry-content")]//a');
