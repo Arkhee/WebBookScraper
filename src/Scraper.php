@@ -143,7 +143,7 @@ class Scraper
             }
             if(isset($parse['host']) && strpos($url,$parse['host'])!==false && strpos($lien,"?share=")===false)
             {
-                $toc->addToc($lien,$libelle);
+                $toc->addToc($libelle,$lien);
             }
         }
         $toc->illustration = $illustration;
