@@ -1,0 +1,23 @@
+{
+  "name": "arkhee/webbookscraper",
+  "description": "This simple PHP project can be used to extract web novels from websites",
+  "license" : "GPL-3.0 license",
+  "homepage": "https://github.com/Arkhee/WebBookScraper",
+  "require": {
+    "php": "^7.1 || ^8"
+  },
+  "authors": [
+    {
+      "name": "Yannick Betemps",
+      "email": "arkhee@gmail.com",
+      "homepage": "https://github.com/Arkhee",
+      "role": "Maintainer"
+    }
+  ],
+  "archive": {
+    "exclude": [
+      "/test",
+      "/sample"
+    ]
+  }
+}
