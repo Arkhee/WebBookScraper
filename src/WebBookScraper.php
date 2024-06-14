@@ -24,6 +24,7 @@ class WebBookScraper
     private static $scrape_path_chapter_main = 'article';
     private static $scrape_path_chapter_header = 'header';
     private static $scrape_path_chapter_content = 'entry-content';
+    private static $scrape_img_convert_in_content = true;
     /**
      * @param $url
      * @return void
@@ -38,6 +39,25 @@ class WebBookScraper
             $this->logfile = sys_get_temp_dir().'/'.uniqid("webscaper_").".log";
             file_put_contents($this->logfile,"");
         }
+    }
+
+    /**
+     * @param $convert
+     * @return void
+     * Set the option to convert images to local files (for epub insertion)
+     */
+    public static function setScrapeImgConvert($convert = true)
+    {
+        self::$scrape_img_convert_in_content = (bool)$convert;
+    }
+
+    /**
+     * @return void
+     * Get the option to convert images to local files (for epub insertion)
+     */
+    public static function getScrapeImgConvert():bool
+    {
+        return (bool)self::$scrape_img_convert_in_content;
     }
 
     /**
@@ -76,7 +96,7 @@ class WebBookScraper
      */
     public static function setScrapePathChapterMain(string $path="article")
     {
-        self::$scrape_path_toc_main = $path;
+        self::$scrape_path_chapter_main = $path;
     }
 
     /**
@@ -86,7 +106,7 @@ class WebBookScraper
      */
     public static function setScrapePathChapterHeader(string $path="header")
     {
-        self::$scrape_path_toc_header = $path;
+        self::$scrape_path_chapter_header = $path;
     }
 
     /**
@@ -96,7 +116,7 @@ class WebBookScraper
      */
     public static function setScrapePathChapterContent(string $path="entry-content")
     {
-        self::$scrape_path_toc_content = $path;
+        self::$scrape_path_chapter_content = $path;
     }
 
 

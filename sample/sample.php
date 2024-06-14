@@ -1,11 +1,32 @@
 <?php
-require_once("../src/WebBookScraper.php");
-require_once("../src/Scraper.php");
-require_once("../src/StructChapter.php");
-require_once("../src/StructCover.php");
-require_once("../src/StructToc.php");
-require_once("../src/WebBookScraper.php");
+/*
+ * Note : this sample requires the Simplepubgen to work completely and produce an epub file
+ * If you are looking for a simple example for WebBookScraper just stop before the Simplepubgen part
+
+ */
+require_once("./vendor/autoload.php");
 use WebBookScraper\WebBookScraper;
+use Simplepubgen\Simplepubgen;
+if(isset($_POST["url"]))
+{
+    $url = $_POST["url"];
+    $book = new WebBookScraper($url,true);
+    $book->setLogFile(__DIR__.'/log.txt');
+    $book->setCacheDir(__DIR__.'/cache');
+    $book->useCache(true);
+    $book->getBook();
+    $epub = new Simplepubgen($book->cover->title);
+    $epub->setCover($book->cover->illustration);
+    foreach($book->chapters as $chapter)
+    {
+        $epub->addChapter($chapter->title,$chapter->content);
+        foreach($chapter->getExternalResources() as $resource)
+        {
+            $epub->addResource($resource->getResourceName(),$resource->getResourceURL());
+        }
+    }
+    $epub->generateEpub() ;
+}
 ?>
 <html lang="en-EN">
 <head>
@@ -15,26 +36,8 @@ use WebBookScraper\WebBookScraper;
 <body>
 <form method="post">
     <label for="url">Type URL to scrape :</label>
-    <input type="text" id="url" name="url" placeholder="URL du livre">
-    <input type="submit" value="Récupérer le livre">
+    <input type="text" id="url" name="url" placeholder="Book URL">
+    <input type="submit" value="Let's go get the book">
 </form>
 </body>
 </html>
-<?php
-if(isset($_POST["url"]))
-{
-    $url = $_POST["url"];
-    $book = new WebBookScraper($url);
-    $book->getBook();
-    echo "<h1>".$book->cover->title."</h1>\r\n";
-    echo "Liens : <br>\r\n";
-    echo "<ul>\r\n";
-    foreach($book->cover->toc as $toc)
-    {
-        echo "<li><a href='".$toc->url."'>".$toc->title."</a></li>\r\n";
-    }
-    echo "</ul>\r\n";
-    echo "Premier chapitre : <br />\r\n";
-    echo "<h2>".$book->chapters[0]->title."</h2>\r\n";
-    echo "<div class='content'>".$book->chapters[0]->content."</div>\r\n";
-}

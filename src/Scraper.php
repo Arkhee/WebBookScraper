@@ -168,21 +168,24 @@ class Scraper
             /*
              * Replacing all remaining img src to a local value then returning the array
              */
-            // Sélectionnez tous les éléments <img>
-            $dom->loadHTML(mb_convert_encoding($contenu, 'HTML-ENTITIES', 'UTF-8'));
-            $xpath = new \DOMXPath($dom);
-            $images = $xpath->query('//img');
-
-            foreach ($images as $img) {
-                // Récupérez l'URL actuelle du tag src
-                $currentSrc = $img->getAttribute('src');
-                $newResourceName = $chapter->addExternalResource($currentSrc);
-                $img->setAttribute('src', "../image/".$newResourceName);
-            }
-            if(count($images))
+            if(WebBookScraper::getScrapeImgConvert())
             {
-                $entry_content_div = $xpath->query("//div[contains(@class, '".$locationContent."')]");
-                $contenu = $dom->saveHTML($entry_content_div[0]);
+                // Sélectionnez tous les éléments <img>
+                $dom->loadHTML(mb_convert_encoding($contenu, 'HTML-ENTITIES', 'UTF-8'));
+                $xpath = new \DOMXPath($dom);
+                $images = $xpath->query('//img');
+
+                foreach ($images as $img) {
+                    // Récupérez l'URL actuelle du tag src
+                    $currentSrc = $img->getAttribute('src');
+                    $newResourceName = $chapter->addExternalResource($currentSrc);
+                    $img->setAttribute('src', "../image/".$newResourceName);
+                }
+                if(count($images))
+                {
+                    $entry_content_div = $xpath->query("//div[contains(@class, '".$locationContent."')]");
+                    $contenu = $dom->saveHTML($entry_content_div[0]);
+                }
             }
 
         }
