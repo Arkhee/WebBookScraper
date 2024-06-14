@@ -50,7 +50,7 @@ class Scraper
     {
         $chapter = new StructChapter();
         // Charger le HTML dans DOMDocument
-        $dom = new \DOMDocument();
+        $dom = new \DOMDocument('1.0', 'UTF-8');
         libxml_use_internal_errors(true);
         $dom->loadHTML($html);
         libxml_clear_errors();
