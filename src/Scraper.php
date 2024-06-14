@@ -102,7 +102,7 @@ class Scraper
             }
         }
 
-        $elementsToRemove = ["figure","iframe"];
+        $elementsToRemove = ["figure","iframe", "script"];
         foreach($elementsToRemove as $curElement)
         {
             // Sélectionnez tous les éléments <figure>
