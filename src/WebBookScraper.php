@@ -129,13 +129,24 @@ class WebBookScraper
     {
         $this->addLog("Beginning scraping book");
         $begin = microtime(true);
-        $this->cover = $this->getContent('Toc',$this->url);
+        try {
+            $this->cover = $this->getContent('Toc',$this->url);
+        }
+        catch(\Exception $e) {
+            $this->addLog("Error on main page : " . $e->getMessage(), $this->url);
+        }
         $end = microtime(true);
         $this->addLog("Main page",$this->url,$end-$begin);
         foreach($this->cover->toc as $index => $toc)
         {
             $begin = microtime(true);
-            $this->chapters[] = $this->getContent('Chapter',$toc->url); //Scraper::Chapter($toc->url);
+            try
+            {
+                $this->chapters[] = $this->getContent('Chapter',$toc->url); //Scraper::Chapter($toc->url);
+            }
+            catch(\Exception $e) {
+                $this->addLog("Error on chapter " . ($index + 1) . " : " . $e->getMessage(), $toc->url);
+            }
             $end = microtime(true);
             $this->addLog("Chapter ".($index+1)." on ".count($this->cover->toc),$toc->url,$end-$begin);
         }
