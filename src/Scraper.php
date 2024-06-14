@@ -77,7 +77,7 @@ class Scraper
          * Cleaning forbidden attributes
          */
         // Définissez les noms des attributs que vous souhaitez supprimer
-        $attributesToRemove = ['class', 'style'];
+        $attributesToRemove = ["data-recalc-dims", "fetchpriority", "decoding", "srcset", "sizes", "aria-level", "loading", "data-cfemail", "sandbox", "security", "data-secret"];
         // Tags to scan
         $tagsToScan = [ "a", "img" ];
 
