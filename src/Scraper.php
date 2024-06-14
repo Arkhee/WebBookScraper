@@ -83,13 +83,8 @@ class Scraper
         foreach ($images as $img) {
             // Récupérez l'URL actuelle du tag src
             $currentSrc = $img->getAttribute('src');
-            $ressource = pathinfo($currentSrc);
-            $newRessourceName = "img_".md5($currentSrc).".".$ressource['extension'];
-            $externalRessources[$newRessourceName] = $currentSrc;
-            //echo "Ancienne URL: $currentSrc\n"; // Affiche l'ancienne URL (facultatif)
-
-            // Remplacez l'URL par la nouvelle valeur
-            $img->setAttribute('src', "../images/".$newRessourceName);
+            $newResourceName = $chapter->addExternalResource($currentSrc);
+            $img->setAttribute('src', "../image/".$newResourceName);
         }
 
 
@@ -116,7 +111,7 @@ class Scraper
             }
         }
 
-        $elementsToRemove = ["figure"];
+        $elementsToRemove = ["figure","iframe"];
         foreach($elementsToRemove as $curElement)
         {
             // Sélectionnez tous les éléments <figure>
@@ -174,7 +169,7 @@ class Scraper
         $chapter->content = $contenu;
         $chapter->title = $chapitre;
         $chapter->url = $url;
-        $chapter->externalRessources = $externalRessources;
+        //$chapter->externalRessources = $externalRessources;
         return $chapter;
     }
 
