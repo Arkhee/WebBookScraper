@@ -19,7 +19,7 @@ class StructChapter
         $resource = new StructExternalResource($url);
         if(!empty($resource->extension))
         {
-            $this->externalResources[] = $resource;
+            $this->externalResources[$resource->getResourceName()] = $resource;
         }
         return $resource->getResourceName();
     }
