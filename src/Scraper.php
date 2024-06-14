@@ -138,20 +138,6 @@ class Scraper
         }
 
 
-        /*
-         * Replacing all remaining img src to a local value then returning the array
-         */
-        // Sélectionnez tous les éléments <img>
-        $images = $xpath->query('//img');
-
-        foreach ($images as $img) {
-            // Récupérez l'URL actuelle du tag src
-            $currentSrc = $img->getAttribute('src');
-            $newResourceName = $chapter->addExternalResource($currentSrc);
-            $img->setAttribute('src', "../image/".$newResourceName);
-        }
-
-
 
         // Récupérer le contenu du div ayant la classe "entry-content" dans la balise article
         $entry_content_divs = $xpath->query("//article//div[contains(@class, 'entry-content')]");
@@ -167,6 +153,24 @@ class Scraper
                     $entry_content_div->removeChild($child);
                 }
             }
+
+
+            /*
+             * Replacing all remaining img src to a local value then returning the array
+             */
+            // Sélectionnez tous les éléments <img>
+            $images = $xpath->query('//img');
+
+            foreach ($images as $img) {
+                // Récupérez l'URL actuelle du tag src
+                $currentSrc = $img->getAttribute('src');
+                $newResourceName = $chapter->addExternalResource($currentSrc);
+                $img->setAttribute('src', "../image/".$newResourceName);
+            }
+
+
+
+
             $contenu = $dom->saveHTML($entry_content_div);
         }
         $chapter->content = $contenu;
