@@ -12,8 +12,8 @@ class StructExternalResource
         //$url = $arrUrl["scheme"]."://".$arrUrl["host"].$arrUrl["path"];
         $this->url = $url;
         $resource = pathinfo($arrUrl["path"]);
-        $extension = $resource['extension'];
-        $this->filename = "img_".md5($url).".".$resource['extension'];
+        $this->extension = $resource['extension'];
+        $this->filename = "img_".md5($url).".".$this->extension;
         /*
         $this->resourceFolder= $resourceFolder;
         if(!file_exists($resourceFolder))
