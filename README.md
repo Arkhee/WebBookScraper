@@ -30,3 +30,15 @@ The project is available on packagist and can be installed using composer:
 ```bash
 composer require "arkhee/webbookscraper""
 ```
+
+
+## Example
+There is a sample provided to see how it works, have a look at the sample folder
+To use it as-is you must use the Simplepubgen and the WebBookScraper packages.
+Created a new folder on your server and copy the sample file at it's root
+Install both packages with composer and run the sample file.
+
+```bash
+composer require "arkhee/simplepubgen"
+composer require "arkhee/webbookscraper"
+```
