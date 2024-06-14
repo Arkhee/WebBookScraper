@@ -165,7 +165,7 @@ class Scraper
              * Replacing all remaining img src to a local value then returning the array
              */
             // Sélectionnez tous les éléments <img>
-            $dom->loadHTML($contenu);
+            $dom->loadHTML(mb_convert_encoding($contenu, 'HTML-ENTITIES', 'UTF-8'));
             $xpath = new \DOMXPath($dom);
             $images = $xpath->query('//img');
 
