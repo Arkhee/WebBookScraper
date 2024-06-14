@@ -34,6 +34,44 @@ class WebBookScraper
         }
     }
 
+    public function clearCache()
+    {
+        if(file_exists($this->cacheDir))
+        {
+            $this->RmDir($this->cacheDir);
+            mkdir($this->cacheDir);
+        }
+    }
+
+    private function Rmdir($dir,$recurse=true)
+    {
+        $dir=trim($dir);
+        if(empty($dir) || $dir=="." || $dir==".." || $dir=="/" || $dir=="//") return false;
+        if (is_dir($dir))
+        {
+            if($recurse)
+            {
+                $objects = scandir($dir);
+                foreach ($objects as $object)
+                {
+                    if ($object != "." && $object != "..")
+                    {
+                        if (is_dir($dir. DIRECTORY_SEPARATOR .$object) && !is_link($dir."/".$object))
+                        {
+                            $this->Rmdir($dir. DIRECTORY_SEPARATOR .$object,$recurse);
+                        }
+                        else
+                        {
+                            unlink($dir. DIRECTORY_SEPARATOR .$object);
+                        }
+                    }
+                }
+            }
+            rmdir($dir);
+        }
+        return true;
+    }
+
     public function setLogFile($logfile)
     {
         $this->logfile = $logfile;
