@@ -175,7 +175,7 @@ class Scraper
                 $img->setAttribute('src', "../image/".$newResourceName);
             }
             $entry_content_div = $xpath->query("//div[contains(@class, 'entry-content')]");
-            $contenu = $dom->saveHTML($entry_content_div);
+            $contenu = $dom->saveHTML($entry_content_div[0]);
 
         }
         $chapter->content = $contenu;
