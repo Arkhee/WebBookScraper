@@ -53,31 +53,6 @@ class WebBookScraper
         return $this->log;
     }
 
-    private function storeScrape($url,$content)
-    {
-        if($this->cacheActive)
-        {
-            $hash = md5($url);
-            if(!file_exists($this->cacheDir))
-            {
-                mkdir($this->cacheDir);
-            }
-            $filename = $this->cacheDir."/".$hash;
-            file_put_contents($filename,$content);
-        }
-    }
-
-    private function getCache($url)
-    {
-        if($this->cacheActive)
-        {
-            $hash = md5($url);
-            $filename = $this->cacheDir."/".$hash;
-            return file_get_contents($filename);
-        }
-        return "";
-    }
-
     private function isCached($url)
     {
         if($this->cacheActive)
@@ -113,12 +88,11 @@ class WebBookScraper
     {
         if($this->isCached($url))
         {
-            $content = $this->getCache($url);
+            $content = Scraper::$type($url,$this->cacheDir);
         }
         else
         {
             $content = Scraper::$type($url);
-            $this->storeScrape($url,$content);
         }
         return $content;
     }

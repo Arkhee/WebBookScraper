@@ -4,20 +4,35 @@ use WebBookScraper\StructChapter;
 use WebBookScraper\StructCover;
 class Scraper
 {
-    public static function Toc($url):StructCover
+    public static function Toc($url,$cacheDir=""):StructCover
     {
-        $html = self::ReadURLContent($url);
+        $html = self::ReadURLContent($url,$cacheDir);
         $xpath = self::CleanTocHTML($html);
         $toc = self::ExtractTocInformations($xpath,$url);
         return $toc;
     }
 
-    public static function Chapter($url):StructChapter
+    public static function Chapter($url,$cacheDir=""):StructChapter
     {
-        $html = self::ReadURLContent($url);
+        $html = self::ReadURLContent($url,$cacheDir);
         $chapter = self::CleanContentHTML($html,$url);
         return $chapter;
     }
+
+    public static function storeScrape($url,$content,$cacheDir="")
+    {
+        if(!empty($cacheDir))
+        {
+            $hash = md5($url);
+            if(!file_exists($cacheDir))
+            {
+                mkdir($cacheDir);
+            }
+            $filename = $cacheDir."/".$hash;
+            file_put_contents($filename,$content);
+        }
+    }
+
 
 
     public static function CleanContentHTML($html,$url):StructChapter
@@ -164,8 +179,16 @@ class Scraper
         return tidy_get_output($tidy);
     }
 
-    public static function ReadURLContent($url):string
+    public static function ReadURLContent($url,$cacheDir=""):string
     {
+        if(!empty($cacheDir))
+        {
+            $content = self::getCache($url,$cacheDir);
+            if(!empty($content))
+            {
+                return $content;
+            }
+        }
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -176,4 +199,19 @@ class Scraper
         $content = self::TidyHTML($content);
         return $content;
     }
+
+    public static function getCache($url,$cacheDir)
+    {
+        $hash = md5($url);
+        $filename = $cacheDir."/".$hash;
+        if(file_exists($filename))
+        {
+            return file_get_contents($filename);
+        }
+        else
+        {
+            return "";
+        }
+    }
+
 }
