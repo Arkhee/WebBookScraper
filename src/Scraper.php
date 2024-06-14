@@ -74,19 +74,6 @@ class Scraper
         $xpath = new \DOMXPath($dom);
 
 
-        /*
-         * Replacing all img src to a local value then returning the array
-         */
-        // Sélectionnez tous les éléments <img>
-        $images = $xpath->query('//img');
-
-        foreach ($images as $img) {
-            // Récupérez l'URL actuelle du tag src
-            $currentSrc = $img->getAttribute('src');
-            $newResourceName = $chapter->addExternalResource($currentSrc);
-            $img->setAttribute('src', "../image/".$newResourceName);
-        }
-
 
         /*
          * Cleaning forbidden attributes
@@ -149,6 +136,22 @@ class Scraper
                 break;
             }
         }
+
+
+        /*
+         * Replacing all remaining img src to a local value then returning the array
+         */
+        // Sélectionnez tous les éléments <img>
+        $images = $xpath->query('//img');
+
+        foreach ($images as $img) {
+            // Récupérez l'URL actuelle du tag src
+            $currentSrc = $img->getAttribute('src');
+            $newResourceName = $chapter->addExternalResource($currentSrc);
+            $img->setAttribute('src', "../image/".$newResourceName);
+        }
+
+
 
         // Récupérer le contenu du div ayant la classe "entry-content" dans la balise article
         $entry_content_divs = $xpath->query("//article//div[contains(@class, 'entry-content')]");
