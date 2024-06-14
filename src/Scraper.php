@@ -197,6 +197,10 @@ class Scraper
         $content = curl_exec($ch);
         curl_close($ch);
         $content = self::TidyHTML($content);
+        if(!empty($cacheDir))
+        {
+            self::storeScrape($url,$content,$cacheDir);
+        }
         return $content;
     }
 
