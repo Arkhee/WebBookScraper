@@ -9,7 +9,7 @@ class StructExternalResource
     public function __construct($url /* ,$resourceFolder */)
     {
         $arrUrl = parse_url($url);
-        //$url = $arrUrl["scheme"]."://".$arrUrl["host"].$arrUrl["path"];
+        $url = $arrUrl["scheme"]."://".$arrUrl["host"].$arrUrl["path"];
         $this->url = $url;
         $resource = pathinfo($arrUrl["path"]);
         $this->extension = $resource['extension'];
