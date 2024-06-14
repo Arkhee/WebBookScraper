@@ -7,7 +7,7 @@ class Scraper
     public static function Toc($url,$cacheDir=""):StructCover
     {
         $html = self::ReadURLContent($url,$cacheDir);
-        $xpath = self::CleanTocHTML($html);
+        $xpath = self::CleanTocHTML($html,$cacheDir);
         $toc = self::ExtractTocInformations($xpath,$url);
         return $toc;
     }
@@ -15,9 +15,20 @@ class Scraper
     public static function Chapter($url,$cacheDir=""):StructChapter
     {
         $html = self::ReadURLContent($url,$cacheDir);
-        $chapter = self::CleanContentHTML($html,$url);
+        $chapter = self::CleanContentHTML($html,$url,$cacheDir);
         return $chapter;
     }
+
+    public static function removeCache($url,$cacheDir)
+    {
+        $hash = md5($url);
+        $filename = $cacheDir."/".$hash;
+        if(file_exists($filename))
+        {
+            unlink($filename);
+        }
+    }
+
 
     public static function storeScrape($url,$content,$cacheDir="")
     {
@@ -35,7 +46,7 @@ class Scraper
 
 
 
-    public static function CleanContentHTML($html,$url):StructChapter
+    public static function CleanContentHTML($html,$url,$cacheDir=""):StructChapter
     {
         $chapter = new StructChapter();
         // Charger le HTML dans DOMDocument
@@ -47,6 +58,7 @@ class Scraper
         // Récupérer le contenu de la balise "article"
         $articles = $dom->getElementsByTagName('article');
         if ($articles->length === 0) {
+            self::removeCache($url,$cacheDir);
             throw new \Exception("Aucune balise 'article' trouvée.");
         }
         $article = $articles->item(0);
