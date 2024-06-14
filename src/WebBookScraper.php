@@ -28,7 +28,7 @@ class WebBookScraper
         {
             $this->chapters[] = Scraper::Chapter($toc->url);
             // DEBUG
-            break;
+            //break;
         }
     }
 }
