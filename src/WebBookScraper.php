@@ -16,7 +16,8 @@ class WebBookScraper
     private $log = array();
     private $debug = false;
     private $logfile = __DIR__.'/log.txt';
-
+    private $cacheDir = "";
+    private $cacheActive = false;
     /**
      * @param $url
      * @return void
@@ -25,6 +26,7 @@ class WebBookScraper
     {
         $this->url = $url;
         $this->debug = $debug;
+        $this->cacheDir = sys_get_temp_dir()."/webbookscraper_cache";
         if($this->debug)
         {
             $this->logfile = sys_get_temp_dir().'/'.uniqid("webscaper_").".log";
@@ -37,9 +39,54 @@ class WebBookScraper
         $this->logfile = $logfile;
     }
 
+    public function setCacheDir($cachedir)
+    {
+        $this->cacheDir = $cachedir;
+    }
+
+    public function useCache($use=false)
+    {
+        $this->cacheActive = $use;
+    }
     public function getLog()
     {
         return $this->log;
+    }
+
+    private function storeScrape($url,$content)
+    {
+        if($this->cacheActive)
+        {
+            $hash = md5($url);
+            if(!file_exists($this->cacheDir))
+            {
+                mkdir($this->cacheDir);
+            }
+            $filename = $this->cacheDir."/".$hash;
+            file_put_contents($filename,$content);
+        }
+    }
+
+    private function getCache($url)
+    {
+        if($this->cacheActive)
+        {
+            $hash = md5($url);
+            $filename = $this->cacheDir."/".$hash;
+            return file_get_contents($filename);
+        }
+        return "";
+    }
+
+    private function isCached($url)
+    {
+        if($this->cacheActive)
+        {
+            $hash = md5($url);
+            $filename = $this->cacheDir."/".$hash;
+            return file_exists($filename);
+        }
+        return false;
     }
 
     /**
@@ -62,17 +109,31 @@ class WebBookScraper
         }
     }
 
+    private function getContent($type,$url):StructCover|StructChapter
+    {
+        if($this->isCached($url))
+        {
+            $content = $this->getCache($url);
+        }
+        else
+        {
+            $content = Scraper::$type($url);
+            $this->storeScrape($url,$content);
+        }
+        return $content;
+    }
+
     public function getBook()
     {
         $this->addLog("Beginning scraping book");
         $begin = microtime(true);
-        $this->cover = Scraper::Toc($this->url);
+        $this->cover = $this->getContent('Toc',$this->url);
         $end = microtime(true);
         $this->addLog("Main page",$this->url,$end-$begin);
         foreach($this->cover->toc as $index => $toc)
         {
             $begin = microtime(true);
-            $this->chapters[] = Scraper::Chapter($toc->url);
+            $this->chapters[] = $this->getContent('Chapter',$toc->url); //Scraper::Chapter($toc->url);
             $end = microtime(true);
             $this->addLog("Chapter ".($index+1)." on ".count($this->cover->toc),$toc->url,$end-$begin);
         }
