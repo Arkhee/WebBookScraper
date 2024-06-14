@@ -77,9 +77,9 @@ class Scraper
          * Cleaning forbidden attributes
          */
         // Définissez les noms des attributs que vous souhaitez supprimer
-        $attributesToRemove = ["data-recalc-dims", "fetchpriority", "decoding", "srcset", "sizes", "aria-level", "loading", "data-cfemail", "sandbox", "security", "data-secret"];
+        $attributesToRemove = ["href","data-recalc-dims", "fetchpriority", "decoding", "srcset", "sizes", "aria-level", "loading", "data-cfemail", "sandbox", "security", "data-secret"];
         // Tags to scan
-        $tagsToScan = [ "a", "img" ];
+        $tagsToScan = [ "a", "img", "li" ];
 
         // Sélectionnez toutes les balises que vous souhaitez modifier
         // Par exemple, ici on sélectionne toutes les balises div
