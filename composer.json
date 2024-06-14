@@ -1,7 +1,7 @@
 {
   "name": "arkhee/webbookscraper",
   "description": "This simple PHP project can be used to extract groups of page organized with a summary and individual pages per chapter , like web novels websites",
-  "license" : "GPL-3.0 license",
+  "license" : "GPL-3.0-or-later",
   "homepage": "https://github.com/Arkhee/WebBookScraper",
   "require": {
     "php": "^8"
