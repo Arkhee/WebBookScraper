@@ -4,6 +4,7 @@ class StructExternalResource
 {
     public $url;
     public $filename;
+    public $extension = "";
     //public  $resourceFolder="";
     public function __construct($url /* ,$resourceFolder */)
     {
@@ -11,6 +12,7 @@ class StructExternalResource
         //$url = $arrUrl["scheme"]."://".$arrUrl["host"].$arrUrl["path"];
         $this->url = $url;
         $resource = pathinfo($arrUrl["path"]);
+        $extension = $resource['extension'];
         $this->filename = "img_".md5($url).".".$resource['extension'];
         /*
         $this->resourceFolder= $resourceFolder;
