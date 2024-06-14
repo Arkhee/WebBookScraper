@@ -53,16 +53,6 @@ class WebBookScraper
         return $this->log;
     }
 
-    private function isCached($url)
-    {
-        if($this->cacheActive)
-        {
-            $hash = md5($url);
-            $filename = $this->cacheDir."/".$hash;
-            return file_exists($filename);
-        }
-        return false;
-    }
 
     /**
      * @param $comment
@@ -86,7 +76,7 @@ class WebBookScraper
 
     private function getContent($type,$url):StructCover|StructChapter
     {
-        if($this->isCached($url))
+        if($this->cacheActive && !empty($this->cacheDir))
         {
             $content = Scraper::$type($url,$this->cacheDir);
         }
