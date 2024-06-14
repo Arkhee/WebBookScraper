@@ -155,10 +155,17 @@ class Scraper
             }
 
 
+
+
+
+            $contenu = $dom->saveHTML($entry_content_div);
+
             /*
              * Replacing all remaining img src to a local value then returning the array
              */
             // Sélectionnez tous les éléments <img>
+            $dom->loadHTML($contenu);
+            $xpath = new \DOMXPath($dom);
             $images = $xpath->query('//img');
 
             foreach ($images as $img) {
@@ -167,11 +174,9 @@ class Scraper
                 $newResourceName = $chapter->addExternalResource($currentSrc);
                 $img->setAttribute('src', "../image/".$newResourceName);
             }
-
-
-
-
+            $entry_content_div = $xpath->query("//div[contains(@class, 'entry-content')]");
             $contenu = $dom->saveHTML($entry_content_div);
+
         }
         $chapter->content = $contenu;
         $chapter->title = $chapitre;
