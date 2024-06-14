@@ -27,20 +27,38 @@ class WebBookScraper
         $this->debug = $debug;
         if($this->debug)
         {
+            $this->logfile = sys_get_temp_dir().'/'.uniqid("webscaper_").".log";
             file_put_contents($this->logfile,"");
         }
     }
 
+    public function setLogFile($logfile)
+    {
+        $this->logfile = $logfile;
+    }
+
+    public function getLog()
+    {
+        return $this->log;
+    }
+
+    /**
+     * @param $comment
+     * @param $url
+     * @param $duration
+     * @return void
+     */
     private function addLog($comment, $url="",$duration=0)
     {
-        $this->log[]= array(
+        $curlog = array(
             "comment" => $comment,
             "url" => $url,
             "duration" => $duration
         );
+        $this->log[]= $curlog;
         if($this->debug)
         {
-            file_put_contents($this->logfile,implode("\t",$this->log).PHP_EOL,FILE_APPEND);
+            file_put_contents($this->logfile,implode("\t",$curlog).PHP_EOL,FILE_APPEND);
         }
     }
 
