@@ -73,6 +73,26 @@ class Scraper
         // Supprimer les balises div qui ont la classe wp-dark-mode-switch
         $xpath = new \DOMXPath($dom);
 
+
+        /*
+         * Replacing all img src to a local value then returning the array
+         */
+        // Sélectionnez tous les éléments <img>
+        $images = $xpath->query('//img');
+
+        foreach ($images as $img) {
+            // Récupérez l'URL actuelle du tag src
+            $currentSrc = $img->getAttribute('src');
+            $ressource = pathinfo($currentSrc);
+            $newRessourceName = "img_".md5($currentSrc).".".$ressource['extension'];
+            $externalRessources[$newRessourceName] = $currentSrc;
+            //echo "Ancienne URL: $currentSrc\n"; // Affiche l'ancienne URL (facultatif)
+
+            // Remplacez l'URL par la nouvelle valeur
+            $img->setAttribute('src', "../images/".$newRessourceName);
+        }
+
+
         /*
          * Cleaning forbidden attributes
          */
@@ -154,6 +174,7 @@ class Scraper
         $chapter->content = $contenu;
         $chapter->title = $chapitre;
         $chapter->url = $url;
+        $chapter->externalRessources = $externalRessources;
         return $chapter;
     }
 
