@@ -1,5 +1,6 @@
 <?php
 namespace WebBookScraper;
+use WebBookScraper\WebBookScraper;
 use WebBookScraper\StructChapter;
 use WebBookScraper\StructCover;
 class Scraper
@@ -48,6 +49,9 @@ class Scraper
 
     public static function CleanContentHTML($html,$url,$cacheDir=""):StructChapter
     {
+        $locationChapter = WebBookScraper::getScrapePathChapterMain();
+        $locationHeader = WebBookScraper::getScrapePathChapterHeader();
+        $locationContent = WebBookScraper::getScrapePathChapterContent();
         $chapter = new StructChapter();
         // Charger le HTML dans DOMDocument
         $dom = new \DOMDocument('1.0', 'UTF-8');
@@ -56,15 +60,15 @@ class Scraper
         libxml_clear_errors();
 
         // Récupérer le contenu de la balise "article"
-        $articles = $dom->getElementsByTagName('article');
+        $articles = $dom->getElementsByTagName($locationChapter);
         if ($articles->length === 0) {
             self::removeCache($url,$cacheDir);
-            throw new \Exception("Aucune balise 'article' trouvée.");
+            throw new \Exception("No tag ".$locationChapter." found.");
         }
         $article = $articles->item(0);
 
         // Extraire le contenu de la balise "header" contenue dans l'article
-        $headers = $article->getElementsByTagName('header');
+        $headers = $article->getElementsByTagName($locationHeader);
         $chapitre = '';
         if ($headers->length > 0) {
             $chapitre = trim($headers->item(0)->nodeValue);
@@ -140,7 +144,7 @@ class Scraper
 
 
         // Récupérer le contenu du div ayant la classe "entry-content" dans la balise article
-        $entry_content_divs = $xpath->query("//article//div[contains(@class, 'entry-content')]");
+        $entry_content_divs = $xpath->query("//".$locationChapter."//div[contains(@class, '".$locationContent."')]");
         $contenu = '';
         if ($entry_content_divs->length > 0) {
             $entry_content_div = $entry_content_divs->item(0);
@@ -177,7 +181,7 @@ class Scraper
             }
             if(count($images))
             {
-                $entry_content_div = $xpath->query("//div[contains(@class, 'entry-content')]");
+                $entry_content_div = $xpath->query("//div[contains(@class, '".$locationContent."')]");
                 $contenu = $dom->saveHTML($entry_content_div[0]);
             }
 
@@ -191,6 +195,10 @@ class Scraper
 
     public static function CleanTocHTML(string $html):\DOMXPath
     {
+        $locationToc = WebBookScraper::getScrapePathTocMain();
+        $locationHeader = WebBookScraper::getScrapePathTocHeader();
+        $locationContent = WebBookScraper::getScrapePathTocContent();
+
         // Chargement du contenu HTML dans un DOMDocument
         $dom = new \DOMDocument();
         libxml_use_internal_errors(true); // Désactivation des erreurs de libxml
@@ -201,11 +209,11 @@ class Scraper
         $xpath = new \DOMXPath($dom);
 
         // Récupération du contenu de la balise "article"
-        $articleNode = $xpath->query('//article')->item(0);
+        $articleNode = $xpath->query('//'.$locationToc)->item(0);
         $articleContent = $dom->saveHTML($articleNode);
 
         // Extraction du contenu de la balise "header" contenue dans l'article
-        $headerNode = $xpath->query('//article//header')->item(0);
+        $headerNode = $xpath->query('//'.$locationToc.'//'.$locationHeader)->item(0);
         $chapitre = $headerNode ? $dom->saveHTML($headerNode) : '';
 
         // Suppression des balises div avec la classe "wp-dark-mode-switch"
@@ -214,20 +222,24 @@ class Scraper
         }
 
         // Récupération du contenu du div avec la classe "entry-content"
-        $entryContentNode = $xpath->query('//div[contains(@class, "entry-content")]')->item(0);
+        $entryContentNode = $xpath->query('//div[contains(@class, "'.$locationContent.'")]')->item(0);
         $entryContent = $dom->saveHTML($entryContentNode);
         return $xpath;
     }
 
     public static function ExtractTocInformations(\DOMXPath $xpath,$url):StructCover
     {
+        $locationToc = WebBookScraper::getScrapePathTocMain();
+        $locationHeader = WebBookScraper::getScrapePathTocHeader();
+        $locationContent = WebBookScraper::getScrapePathTocContent();
+
         $toc = new StructCover();
         // Extraction du contenu de la balise "header" contenue dans l'article
-        $headerNode = $xpath->query('//article//header')->item(0);
+        $headerNode = $xpath->query('//'.$locationToc.'//'.$locationHeader)->item(0);
         $toc->title = trim($headerNode->nodeValue) ;
 
         // Récupération de tous les liens dans le contenu "entry-content"
-        $links = $xpath->query('//div[contains(@class, "entry-content")]//a');
+        $links = $xpath->query('//div[contains(@class, "'.$locationContent.'")]//a');
         $illustration = '';
         foreach ($links as $link) {
             $lien = $link->getAttribute('href');

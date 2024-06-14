@@ -1,6 +1,6 @@
 {
   "name": "arkhee/webbookscraper",
-  "description": "This simple PHP project can be used to extract web novels from websites",
+  "description": "This simple PHP project can be used to extract groups of page organized with a summary and individual pages per chapter , like web novels websites",
   "license" : "GPL-3.0 license",
   "homepage": "https://github.com/Arkhee/WebBookScraper",
   "require": {

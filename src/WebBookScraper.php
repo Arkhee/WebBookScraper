@@ -18,6 +18,12 @@ class WebBookScraper
     private $logfile = __DIR__.'/log.txt';
     private $cacheDir = "";
     private $cacheActive = false;
+    private static $scrape_path_toc_main = 'article';
+    private static $scrape_path_toc_header = 'header';
+    private static $scrape_path_toc_content = 'entry-content';
+    private static $scrape_path_chapter_main = 'article';
+    private static $scrape_path_chapter_header = 'header';
+    private static $scrape_path_chapter_content = 'entry-content';
     /**
      * @param $url
      * @return void
@@ -33,6 +39,124 @@ class WebBookScraper
             file_put_contents($this->logfile,"");
         }
     }
+
+    /**
+     * @param $path
+     * @return void
+     * Set the main TAG (article, body etc) where the content is located in the TOC page
+     */
+    public static function setScrapePathTocMain(string $path="article")
+    {
+        self::$scrape_path_toc_main = $path;
+    }
+
+    /**
+     * @param $path
+     * @return void
+     * Set the main TAG (header) where the TOC content is located in the TOC page
+     */
+    public static function setScrapePathTocHeader(string $path="header")
+    {
+        self::$scrape_path_toc_header = $path;
+    }
+
+    /**
+     * @param $path
+     * @return void
+     * Set the main CLASS (entry-content) where the TOC content is located in the TOC page
+     */
+    public static function setScrapePathTocContent(string $path="entry-content")
+    {
+        self::$scrape_path_toc_content = $path;
+    }
+    /**
+     * @param $path
+     * @return void
+     * Set the main TAG (article, body etc) where the content is located in the CHAPTER page
+     */
+    public static function setScrapePathChapterMain(string $path="article")
+    {
+        self::$scrape_path_toc_main = $path;
+    }
+
+    /**
+     * @param $path
+     * @return void
+     * Set the main TAG (header) where the TOC content is located in the CHAPTER page
+     */
+    public static function setScrapePathChapterHeader(string $path="header")
+    {
+        self::$scrape_path_toc_header = $path;
+    }
+
+    /**
+     * @param $path
+     * @return void
+     * Set the main CLASS (entry-content) where the TOC content is located in the CHAPTER page
+     */
+    public static function setScrapePathChapterContent(string $path="entry-content")
+    {
+        self::$scrape_path_toc_content = $path;
+    }
+
+
+
+
+    /**
+     * @return void
+     * GET the main TAG (article, body etc) where the content is located in the TOC page
+     */
+    public static function getScrapePathTocMain():string
+    {
+        return self::$scrape_path_toc_main;
+    }
+
+    /**
+     * @return void
+     * GET the main TAG (header) where the TOC content is located in the TOC page
+     */
+    public static function getScrapePathTocHeader():string
+    {
+        return self::$scrape_path_toc_header;
+    }
+
+    /**
+     * @return void
+     * GET the main CLASS (entry-content) where the TOC content is located in the TOC page
+     */
+    public static function getScrapePathTocContent():string
+    {
+        return self::$scrape_path_toc_content;
+    }
+    /**
+     * @return void
+     * GET the main TAG (article, body etc) where the content is located in the CHAPTER page
+     */
+    public static function getScrapePathChapterMain():string
+    {
+        return self::$scrape_path_toc_main;
+    }
+
+    /**
+     * @return void
+     * GET the main TAG (header) where the TOC content is located in the CHAPTER page
+     */
+    public static function getScrapePathChapterHeader():string
+    {
+        return self::$scrape_path_toc_header;
+    }
+
+    /**
+     * @return void
+     * GET the main CLASS (entry-content) where the TOC content is located in the CHAPTER page
+     */
+    public static function getScrapePathChapterContent():string
+    {
+        return self::$scrape_path_toc_content;
+    }
+
+
+
 
     public function clearCache()
     {
