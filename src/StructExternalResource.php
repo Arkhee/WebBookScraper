@@ -7,8 +7,10 @@ class StructExternalResource
     //public  $resourceFolder="";
     public function __construct($url /* ,$resourceFolder */)
     {
+        $arrUrl = parse_url($url);
+        //$url = $arrUrl["scheme"]."://".$arrUrl["host"].$arrUrl["path"];
         $this->url = $url;
-        $resource = pathinfo($url);
+        $resource = pathinfo($arrUrl["path"]);
         $this->filename = "img_".md5($url).".".$resource['extension'];
         /*
         $this->resourceFolder= $resourceFolder;
