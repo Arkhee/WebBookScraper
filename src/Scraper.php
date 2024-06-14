@@ -72,6 +72,46 @@ class Scraper
 
         // Supprimer les balises div qui ont la classe wp-dark-mode-switch
         $xpath = new \DOMXPath($dom);
+
+        /*
+         * Cleaning forbidden attributes
+         */
+        // Définissez les noms des attributs que vous souhaitez supprimer
+        $attributesToRemove = ['class', 'style'];
+        // Tags to scan
+        $tagsToScan = [ "a", "img" ];
+
+        // Sélectionnez toutes les balises que vous souhaitez modifier
+        // Par exemple, ici on sélectionne toutes les balises div
+        foreach($tagsToScan as $curElement)
+        {
+            $elements = $xpath->query('//'.$curElement);
+
+            foreach ($elements as $element) {
+                foreach ($attributesToRemove as $attribute) {
+                    if ($element->hasAttribute($attribute)) {
+                        $element->removeAttribute($attribute);
+                    }
+                }
+            }
+        }
+
+        $elementsToRemove = ["figure"];
+        foreach($elementsToRemove as $curElement)
+        {
+            // Sélectionnez tous les éléments <figure>
+            $figures = $xpath->query('//'.$curElement);
+
+            foreach ($figures as $figure) {
+                // Supprimez chaque élément <figure> de son parent
+                $figure->parentNode->removeChild($figure);
+            }
+        }
+
+
+
+
+
         $divs = $xpath->query("//div[contains(@class, 'wp-dark-mode-switch')]");
         foreach ($divs as $div) {
             $div->parentNode->removeChild($div);
