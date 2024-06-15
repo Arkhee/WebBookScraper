@@ -299,6 +299,19 @@ class Scraper
 
     public static function TidyHTML(string $html):string
     {
+        $dom = new \DOMDocument();
+
+        // Charger le code HTML. Utilisez @ pour supprimer les avertissements sur le HTML mal formé.
+        // Utilisez les options LIBXML_HTML_NOIMPLIED et LIBXML_HTML_NODEFDTD pour éviter d'ajouter des balises HTML et BODY automatiquement.
+        @$dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+        // Enregistrer et retourner le HTML corrigé
+        $retour = $dom->saveHTML();
+        if($retour === false) {
+            return $html;
+        }
+
+        /*
         $config = array(
             'indent' => true,
             'output-xhtml' => true,
@@ -308,6 +321,7 @@ class Scraper
         $tidy->parseString($html, $config, 'utf8');
         $tidy->cleanRepair();
         return tidy_get_output($tidy);
+        */
     }
 
     public static function ReadURLContent($url, $cacheDir = ""):string
