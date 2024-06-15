@@ -14,19 +14,6 @@ class StructExternalResource
         $resource = pathinfo($arrUrl["path"]);
         $this->extension = $resource['extension'];
         $this->filename = "img_".md5($url).".".$this->extension;
-        /*
-        $this->resourceFolder= $resourceFolder;
-        if(!file_exists($resourceFolder))
-        {
-            mkdir($resourceFolder);
-        }
-        // check if last character is a slash
-        if(substr($this->resourceFolder,-1)!=="/")
-        {
-            $this->resourceFolder .= "/";
-        }
-        file_put_contents($this->getRessourceFileName(),file_get_contents($url));
-        */
     }
 
     /*

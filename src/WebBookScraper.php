@@ -17,7 +17,12 @@ class WebBookScraper
     private $debug = false;
     private $logfile = __DIR__.'/log.txt';
     private $cacheDir = "";
+    private $cacheRootDir = "";
     private $cacheActive = false;
+    private $batchSize = 50;
+    private $batchCallback = "";
+    private $batchSizeActive = false;
+
     private static $scrape_path_toc_main = 'article';
     private static $scrape_path_toc_header = 'header';
     private static $scrape_path_toc_content = 'entry-content';
@@ -33,7 +38,8 @@ class WebBookScraper
     {
         $this->url = $url;
         $this->debug = $debug;
-        $this->cacheDir = sys_get_temp_dir()."/webbookscraper_cache";
+        $this->cacheRootDir = sys_get_temp_dir()."/webbookscraper_cache/";
+        $this->cacheDir = $this->cacheRootDir."/url_".md5($this->url)."/";
         if($this->debug)
         {
             $this->logfile = sys_get_temp_dir().'/'.uniqid("webscaper_").".log";
@@ -183,7 +189,7 @@ class WebBookScraper
         if(file_exists($this->cacheDir))
         {
             $this->RmDir($this->cacheDir);
-            mkdir($this->cacheDir);
+            mkdir($this->cacheDir,0777,true);
         }
     }
 
@@ -216,6 +222,33 @@ class WebBookScraper
         return true;
     }
 
+
+    public static function GetCalledURL():string
+    {
+        return $_SERVER['REQUEST_URI'];
+    }
+
+    public static function Redirect($url,$message="", $callback="")
+    {
+        if(!headers_sent() && empty($message))
+        {
+            header("Location:".$url);
+        }
+        else
+        {
+            if(!empty($callback))
+            {
+                echo "<script type='text/javascript'>".$callback."('".$message."');</script>\r\n";
+            }
+            else
+            {
+                echo "<script type='text/javascript'>alert('".$message."');</script>\r\n";
+            }
+            echo "<script type='text/javascript'>window.location = '".$url."';</script>\r\n";
+        }
+        die();
+    }
+
     public function setLogFile($logfile)
     {
         $this->logfile = $logfile;
@@ -223,7 +256,16 @@ class WebBookScraper
 
     public function setCacheDir($cachedir)
     {
+        $this->cacheRootDir = $cachedir;
         $this->cacheDir = $cachedir;
+        // add trailing slash if missing
+        if(substr($this->cacheDir,-1)!=="/")
+        {
+            $this->cacheDir .= "/";
+            $this->cacheRootDir .= "/";
+        }
+        // Add url md5 to cache dir
+        $this->cacheDir .= "url_".md5($this->url)."/";
     }
 
     public function useCache($use=false)
@@ -269,24 +311,53 @@ class WebBookScraper
         return $content;
     }
 
+    public function setBatchCallback($script)
+    {
+        $this->batchCallback = $script;
+    }
+    public function setBatchSize(int $size=50)
+    {
+        $this->batchSize = $size;
+    }
+
+    public function setBatchSizeActive(bool $active=true)
+    {
+        $this->batchSizeActive = $active;
+    }
+
+    private function countFilesInCache($cacheDir)
+    {
+        $nbFiles = count(glob($cacheDir."*"));
+    }
+
     public function getBook()
     {
         $this->addLog("Beginning scraping book");
         $begin = microtime(true);
         try {
             $this->cover = $this->getContent('Toc',$this->url);
+            $this->storeBookInfo($this->cover->title,$this->cover->description);
         }
         catch(\Exception $e) {
             $this->addLog("Error on main page : " . $e->getMessage(), $this->url);
         }
         $end = microtime(true);
         $this->addLog("Main page",$this->url,$end-$begin);
+        $countChapter = 1;
         foreach($this->cover->toc as $index => $toc)
         {
             $begin = microtime(true);
             try
             {
                 $this->chapters[] = $this->getContent('Chapter',$toc->url); //Scraper::Chapter($toc->url);
+                $countChapter ++;
+                if($this->cacheActive && $this->batchSizeActive && $countChapter >= $this->batchSize)
+                {
+                    // If cache active only AND batch size active, redirect to the same page to continue scraping
+                    $countFiles = $this->countFilesInCache($this->cacheDir);
+                    $message = "Batch status : ".$countFiles." on ".count($this->cover->toc);
+                    self::Redirect(self::GetCalledURL(),$message,$this->batchCallback);
+                }
             }
             catch(\Exception $e) {
                 $this->addLog("Error on chapter " . ($index + 1) . " : " . $e->getMessage(), $toc->url);
@@ -295,4 +366,70 @@ class WebBookScraper
             $this->addLog("Chapter ".($index+1)." on ".count($this->cover->toc),$toc->url,$end-$begin);
         }
     }
+
+    /**
+     * @param $url
+     * @return array|mixed
+     * Get the book info from the cache
+     */
+    public function getBookInfo($url="")
+    {
+        if(empty($url))
+        {
+            $url = $this->url;
+        }
+        $infoFile = $this->cacheDir.md5($url).".json";
+        if(file_exists($infoFile))
+        {
+            return json_decode(file_get_contents($infoFile),true);
+        }
+        return array();
+    }
+
+    /**
+     * @param $title
+     * @param $description
+     * @return void
+     * Store the book info in the cache
+     */
+    private function storeBookInfo($title,$description)
+    {
+        if($this->cacheActive)
+        {
+            $infoFile = $this->cacheDir.md5($this->url).".json";
+            if(!file_exists($infoFile))
+            {
+                $bookinfo = array(
+                    "title" => $title,
+                    "url" => $this->url,
+                    "description" => $description
+                );
+                file_put_contents($infoFile,json_encode($bookinfo));
+            }
+            $this->storeAllBooksInfo($this->cover->title,$this->cover->description);
+        }
+    }
+
+    private function storeAllBooksInfo($title,$description)
+    {
+        if($this->cacheActive)
+        {
+            $infoFile = $this->cacheRootDir."books.json";
+            if(file_exists($infoFile))
+            {
+                $books = json_decode(file_get_contents($infoFile),true);
+                $books = array_values($books);
+            }
+            if(!is_array($books)) $books=array();
+            $bookinfo = array(
+                "date" => date("Y-m-d H:i:s"),
+                "title" => $title,
+                "url" => $this->url,
+                "description" => $description
+            );
+            $books[] = $bookinfo;
+            file_put_contents($infoFile,json_encode($books));
+        }
+    }
+
 }

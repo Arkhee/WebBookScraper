@@ -40,7 +40,7 @@ class Scraper
             $hash = md5($url);
             if(!file_exists($cacheDir))
             {
-                mkdir($cacheDir);
+                mkdir($cacheDir,0777,true);
             }
             $filename = $cacheDir."/".$hash;
             file_put_contents($filename,$content);
