@@ -429,6 +429,12 @@ class WebBookScraper
             {
                 $books = json_decode(file_get_contents($infoFile),true);
                 $books = array_values($books);
+                foreach($books as $book)
+                {
+                    if($book["url"]==$this->url) {
+                        return;
+                    }
+                }
             }
             if(!is_array($books)) $books=array();
             $bookinfo = array(
