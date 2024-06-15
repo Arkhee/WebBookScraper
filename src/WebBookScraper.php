@@ -406,15 +406,17 @@ class WebBookScraper
         $this->noSpamTimeInterval = $milliseconds;
     }
 
-    public function getAllBooksInfo()
+    public static function getAllBooksInfo($cacheDir):array
     {
-        if ($this->cacheActive) {
-            $infoFile = $this->cacheRootDir."books.json";
-            if (file_exists($infoFile)) {
-                return json_decode(file_get_contents($infoFile), true);
+        $retour = array();
+        $infoFile = $cacheDir."/"."books.json";
+        if (file_exists($infoFile)) {
+            $retour = json_decode(file_get_contents($infoFile), true);
+            if (!is_array($retour)) {
+                $retour = array();
             }
         }
-        return array();
+        return $retour;
     }
 
     private function storeAllBooksInfo($title, $description)
