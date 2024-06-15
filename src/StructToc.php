@@ -1,5 +1,6 @@
 <?php
 namespace WebBookScraper;
+
 class StructToc
 {
     public $title = "";

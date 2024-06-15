@@ -7,20 +7,20 @@ use WebBookScraper\StructCover;
 
 class Scraper
 {
-    public static function Toc($url, $cacheDir = ""):StructCover
+    public static function contentToc($url, $cacheDir = ""):StructCover
     {
-        $html = self::ReadURLContent($url, $cacheDir);
-        $description = self::ExtractDescriptionInformation($html);
-        $xpath = self::CleanTocHTML($html, $cacheDir);
-        $toc = self::ExtractTocInformations($xpath, $url);
+        $html = self::readURLContent($url, $cacheDir);
+        $description = self::extractDescriptionInformation($html);
+        $xpath = self::cleanTocHTML($html, $cacheDir);
+        $toc = self::extractTocInformations($xpath, $url);
         $toc->description = $description;
         return $toc;
     }
 
-    public static function Chapter($url, $cacheDir = ""):StructChapter
+    public static function contentChapter($url, $cacheDir = ""):StructChapter
     {
-        $html = self::ReadURLContent($url, $cacheDir);
-        $chapter = self::CleanContentHTML($html, $url, $cacheDir);
+        $html = self::readURLContent($url, $cacheDir);
+        $chapter = self::cleanContentHTML($html, $url, $cacheDir);
         return $chapter;
     }
 
@@ -48,7 +48,7 @@ class Scraper
 
 
 
-    public static function CleanContentHTML($html, $url, $cacheDir = ""):StructChapter
+    public static function cleanContentHTML($html, $url, $cacheDir = ""):StructChapter
     {
         $locationChapter = WebBookScraper::getScrapePathChapterMain();
         $locationHeader = WebBookScraper::getScrapePathChapterHeader();
@@ -84,7 +84,10 @@ class Scraper
          * Cleaning forbidden attributes
          */
         // Définissez les noms des attributs que vous souhaitez supprimer
-        $attributesToRemove = ["href","data-recalc-dims", "fetchpriority", "decoding", "srcset", "sizes", "aria-level", "loading", "data-cfemail", "sandbox", "security", "data-secret"];
+        $attributesToRemove = [
+            "href", "data-recalc-dims", "fetchpriority",
+            "decoding", "srcset", "sizes", "aria-level", "loading",
+            "data-cfemail", "sandbox", "security", "data-secret"];
         // Tags to scan
         $tagsToScan = [ "a", "img", "li" ];
 
@@ -149,7 +152,8 @@ class Scraper
             $entry_content_div = $entry_content_divs->item(0);
 
             // Supprimer toutes les balises qu'il contient sauf p, strong, i, em, br
-            $allowed_tags = ['p', 'strong', 'i', 'em', 'br', 'hr', 'center', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li' ];
+            $allowed_tags = ['p', 'strong', 'i', 'em', 'br', 'hr', 'center',
+                            'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li' ];
             $children = $entry_content_div->childNodes;
             foreach ($children as $child) {
                 if ($child instanceof \DOMElement && !in_array($child->tagName, $allowed_tags)) {
@@ -192,7 +196,7 @@ class Scraper
         return $chapter;
     }
 
-    public static function CleanTocHTML(string $html):\DOMXPath
+    public static function cleanTocHTML(string $html):\DOMXPath
     {
         $locationToc = WebBookScraper::getScrapePathTocMain();
         $locationHeader = WebBookScraper::getScrapePathTocHeader();
@@ -226,7 +230,7 @@ class Scraper
         return $xpath;
     }
 
-    public static function ExtractDescriptionInformation(string $html) : string
+    public static function extractDescriptionInformation(string $html) : string
     {
         $locationToc = WebBookScraper::getScrapePathTocMain();
         $locationHeader = WebBookScraper::getScrapePathTocHeader();
@@ -263,7 +267,7 @@ class Scraper
         return $description;
     }
 
-    public static function ExtractTocInformations(\DOMXPath $xpath, $url):StructCover
+    public static function extractTocInformations(\DOMXPath $xpath, $url):StructCover
     {
         $locationToc = WebBookScraper::getScrapePathTocMain();
         $locationHeader = WebBookScraper::getScrapePathTocHeader();
@@ -284,7 +288,8 @@ class Scraper
             //echo "Vérification ".$url." vs ".$arrLien["dirname"]."<br />";
             $infoPathLien = pathinfo($lien);
             // Check if link is an image and if it is the case store it in a separate variable
-            if (isset($infoPathLien['extension']) && in_array(strtolower($infoPathLien['extension']), array('jpg', 'jpeg', 'png'))) {
+            if (isset($infoPathLien['extension'])
+                && in_array(strtolower($infoPathLien['extension']), array('jpg', 'jpeg', 'png'))) {
                 $illustration=$lien;
                 continue;
             }
@@ -297,20 +302,21 @@ class Scraper
         return $toc;
     }
 
-    public static function TidyHTML(string $html):string
+    public static function tidyHTML(string $html):string
     {
         $dom = new \DOMDocument();
 
         // Charger le code HTML. Utilisez @ pour supprimer les avertissements sur le HTML mal formé.
-        // Utilisez les options LIBXML_HTML_NOIMPLIED et LIBXML_HTML_NODEFDTD pour éviter d'ajouter des balises HTML et BODY automatiquement.
+        // Utilisez les options LIBXML_HTML_NOIMPLIED et LIBXML_HTML_NODEFDTD
+        // pour éviter d'ajouter des balises HTML et BODY automatiquement.
         @$dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
         // Enregistrer et retourner le HTML corrigé
         $retour = $dom->saveHTML();
-        if($retour === false) {
-            return $html;
+        if ($retour === false) {
+            $retour = $html;
         }
-
+        return $retour;
         /*
         $config = array(
             'indent' => true,
@@ -324,7 +330,7 @@ class Scraper
         */
     }
 
-    public static function ReadURLContent($url, $cacheDir = ""):string
+    public static function readURLContent($url, $cacheDir = ""):string
     {
         if (!empty($cacheDir)) {
             $content = self::getCache($url, $cacheDir);
@@ -339,7 +345,7 @@ class Scraper
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $content = curl_exec($ch);
         curl_close($ch);
-        $content = self::TidyHTML($content);
+        $content = self::tidyHTML($content);
         if (!empty($cacheDir)) {
             self::storeScrape($url, $content, $cacheDir);
         }

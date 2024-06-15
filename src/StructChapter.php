@@ -1,6 +1,8 @@
 <?php
 namespace WebBookScraper;
+
 use WebBookScraper\StructExternalResource;
+
 class StructChapter
 {
     public $title = "";
@@ -17,8 +19,7 @@ class StructChapter
     public function addExternalResource($url):string
     {
         $resource = new StructExternalResource($url);
-        if(!empty($resource->extension))
-        {
+        if (!empty($resource->extension)) {
             $this->externalResources[$resource->getResourceName()] = $resource;
         }
         return $resource->getResourceName();

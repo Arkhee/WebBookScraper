@@ -288,6 +288,10 @@ class WebBookScraper
 
     private function getContent($type, $url):StructCover|StructChapter
     {
+        $method = "content".$type;
+        if (!method_exists(Scraper::class, $method)) {
+            throw new \Exception("Method ".$method." does not exist in Scraper class");
+        }
         if ($this->cacheActive && !empty($this->cacheDir)) {
             $content = Scraper::$type($url, $this->cacheDir);
         } else {
