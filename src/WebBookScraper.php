@@ -379,9 +379,9 @@ class WebBookScraper
         }
     }
 
-    public function isFileInCache($url)
+    public function isFileInCache($url):bool
     {
-        return $this->cacheDir.md5($url);
+        return file_exists($this->cacheDir.md5($url));
     }
 
 
