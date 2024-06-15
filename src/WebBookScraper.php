@@ -2,6 +2,7 @@
 namespace WebBookScraper;
 
 use WebBookScraper\Scraper;
+use WebBookScraper\Tools;
 
 class WebBookScraper
 {
@@ -189,54 +190,9 @@ class WebBookScraper
     public function clearCache()
     {
         if (file_exists($this->cacheDir)) {
-            $this->RmDir($this->cacheDir);
+            Tools::rmDir($this->cacheDir);
             mkdir($this->cacheDir, 0777, true);
         }
-    }
-
-    private function Rmdir($dir, $recurse = true)
-    {
-        $dir=trim($dir);
-        if (empty($dir) || $dir=="." || $dir==".." || $dir=="/" || $dir=="//") {
-            return false;
-        }
-        if (is_dir($dir)) {
-            if ($recurse) {
-                $objects = scandir($dir);
-                foreach ($objects as $object) {
-                    if ($object != "." && $object != "..") {
-                        if (is_dir($dir. DIRECTORY_SEPARATOR .$object) && !is_link($dir."/".$object)) {
-                            $this->Rmdir($dir. DIRECTORY_SEPARATOR .$object, $recurse);
-                        } else {
-                            unlink($dir. DIRECTORY_SEPARATOR .$object);
-                        }
-                    }
-                }
-            }
-            rmdir($dir);
-        }
-        return true;
-    }
-
-
-    public static function GetCalledURL():string
-    {
-        return $_SERVER['REQUEST_URI'];
-    }
-
-    public static function Redirect($url, $message = "", $callback = "")
-    {
-        if (!headers_sent() && empty($message)) {
-            header("Location:".$url);
-        } else {
-            if (!empty($callback)) {
-                echo "<script type='text/javascript'>".$callback."('".$message."');</script>\r\n";
-            } else {
-                echo "<script type='text/javascript'>alert('".$message."');</script>\r\n";
-            }
-            echo "<script type='text/javascript'>window.location = '".$url."';</script>\r\n";
-        }
-        die();
     }
 
     public function setLogFile($logfile)
@@ -293,9 +249,9 @@ class WebBookScraper
             throw new \Exception("Method ".$method." does not exist in Scraper class");
         }
         if ($this->cacheActive && !empty($this->cacheDir)) {
-            $content = Scraper::$type($url, $this->cacheDir);
+            $content = Scraper::$method($url, $this->cacheDir);
         } else {
-            $content = Scraper::$type($url);
+            $content = Scraper::$method($url);
         }
         return $content;
     }
@@ -344,7 +300,7 @@ class WebBookScraper
                     // If cache active only AND batch size active, redirect to the same page to continue scraping
                     $countFiles = $this->countFilesInCache($this->cacheDir);
                     $message = "Batch status : ".$countFiles." on ".count($this->cover->toc);
-                    self::Redirect(self::GetCalledURL(), $message, $this->batchCallback);
+                    Tools::redirectToUrl(Tools::getCalledURL(), $message, $this->batchCallback);
                 }
             } catch (\Exception $e) {
                 $this->addLog("Error on chapter " . ($index + 1) . " : " . $e->getMessage(), $toc->url);
