@@ -1,55 +1,54 @@
 <?php
 namespace WebBookScraper;
+
 use WebBookScraper\WebBookScraper;
 use WebBookScraper\StructChapter;
 use WebBookScraper\StructCover;
+
 class Scraper
 {
-    public static function Toc($url,$cacheDir=""):StructCover
+    public static function Toc($url, $cacheDir = ""):StructCover
     {
-        $html = self::ReadURLContent($url,$cacheDir);
+        $html = self::ReadURLContent($url, $cacheDir);
         $description = self::ExtractDescriptionInformation($html);
-        $xpath = self::CleanTocHTML($html,$cacheDir);
-        $toc = self::ExtractTocInformations($xpath,$url);
+        $xpath = self::CleanTocHTML($html, $cacheDir);
+        $toc = self::ExtractTocInformations($xpath, $url);
         $toc->description = $description;
         return $toc;
     }
 
-    public static function Chapter($url,$cacheDir=""):StructChapter
+    public static function Chapter($url, $cacheDir = ""):StructChapter
     {
-        $html = self::ReadURLContent($url,$cacheDir);
-        $chapter = self::CleanContentHTML($html,$url,$cacheDir);
+        $html = self::ReadURLContent($url, $cacheDir);
+        $chapter = self::CleanContentHTML($html, $url, $cacheDir);
         return $chapter;
     }
 
-    public static function removeCache($url,$cacheDir)
+    public static function removeCache($url, $cacheDir)
     {
         $hash = md5($url);
         $filename = $cacheDir."/".$hash;
-        if(file_exists($filename))
-        {
+        if (file_exists($filename)) {
             unlink($filename);
         }
     }
 
 
-    public static function storeScrape($url,$content,$cacheDir="")
+    public static function storeScrape($url, $content, $cacheDir = "")
     {
-        if(!empty($cacheDir))
-        {
+        if (!empty($cacheDir)) {
             $hash = md5($url);
-            if(!file_exists($cacheDir))
-            {
-                mkdir($cacheDir,0777,true);
+            if (!file_exists($cacheDir)) {
+                mkdir($cacheDir, 0777, true);
             }
             $filename = $cacheDir."/".$hash;
-            file_put_contents($filename,$content);
+            file_put_contents($filename, $content);
         }
     }
 
 
 
-    public static function CleanContentHTML($html,$url,$cacheDir=""):StructChapter
+    public static function CleanContentHTML($html, $url, $cacheDir = ""):StructChapter
     {
         $locationChapter = WebBookScraper::getScrapePathChapterMain();
         $locationHeader = WebBookScraper::getScrapePathChapterHeader();
@@ -64,7 +63,7 @@ class Scraper
         // Récupérer le contenu de la balise "article"
         $articles = $dom->getElementsByTagName($locationChapter);
         if ($articles->length === 0) {
-            self::removeCache($url,$cacheDir);
+            self::removeCache($url, $cacheDir);
             throw new \Exception("No tag ".$locationChapter." found.");
         }
         $article = $articles->item(0);
@@ -91,8 +90,7 @@ class Scraper
 
         // Sélectionnez toutes les balises que vous souhaitez modifier
         // Par exemple, ici on sélectionne toutes les balises div
-        foreach($tagsToScan as $curElement)
-        {
+        foreach ($tagsToScan as $curElement) {
             $elements = $xpath->query('//'.$curElement);
 
             foreach ($elements as $element) {
@@ -105,8 +103,7 @@ class Scraper
         }
 
         $elementsToRemove = ["figure","iframe", "script"];
-        foreach($elementsToRemove as $curElement)
-        {
+        foreach ($elementsToRemove as $curElement) {
             // Sélectionnez tous les éléments <figure>
             $figures = $xpath->query('//'.$curElement);
 
@@ -170,8 +167,7 @@ class Scraper
             /*
              * Replacing all remaining img src to a local value then returning the array
              */
-            if(WebBookScraper::getScrapeImgConvert())
-            {
+            if (WebBookScraper::getScrapeImgConvert()) {
                 // Sélectionnez tous les éléments <img>
                 $dom->loadHTML(mb_convert_encoding($contenu, 'HTML-ENTITIES', 'UTF-8'));
                 $xpath = new \DOMXPath($dom);
@@ -183,13 +179,11 @@ class Scraper
                     $newResourceName = $chapter->addExternalResource($currentSrc);
                     $img->setAttribute('src', "../image/".$newResourceName);
                 }
-                if(count($images))
-                {
+                if (count($images)) {
                     $entry_content_div = $xpath->query("//div[contains(@class, '".$locationContent."')]");
                     $contenu = $dom->saveHTML($entry_content_div[0]);
                 }
             }
-
         }
         $chapter->content = $contenu;
         $chapter->title = $chapitre;
@@ -253,7 +247,8 @@ class Scraper
         $entries = $xpath->query(
             "//".$locationToc."//div[contains(@class, '".$locationContent."')]//script | ".
             "//".$locationToc."//div[contains(@class, '".$locationContent."')]/div | ".
-            "//".$locationToc."//div[contains(@class, '".$locationContent."')]//br");
+            "//".$locationToc."//div[contains(@class, '".$locationContent."')]//br"
+        );
         foreach ($entries as $entry) {
             $entry->parentNode->removeChild($entry);
         }
@@ -268,7 +263,7 @@ class Scraper
         return $description;
     }
 
-    public static function ExtractTocInformations(\DOMXPath $xpath,$url):StructCover
+    public static function ExtractTocInformations(\DOMXPath $xpath, $url):StructCover
     {
         $locationToc = WebBookScraper::getScrapePathTocMain();
         $locationHeader = WebBookScraper::getScrapePathTocHeader();
@@ -289,13 +284,12 @@ class Scraper
             //echo "Vérification ".$url." vs ".$arrLien["dirname"]."<br />";
             $infoPathLien = pathinfo($lien);
             // Check if link is an image and if it is the case store it in a separate variable
-            if(isset($infoPathLien['extension']) && in_array(strtolower($infoPathLien['extension']), array('jpg', 'jpeg', 'png'))) {
+            if (isset($infoPathLien['extension']) && in_array(strtolower($infoPathLien['extension']), array('jpg', 'jpeg', 'png'))) {
                 $illustration=$lien;
                 continue;
             }
-            if(isset($parse['host']) && strpos($url,$parse['host'])!==false && strpos($lien,"?share=")===false)
-            {
-                $toc->addToc($libelle,$lien);
+            if (isset($parse['host']) && strpos($url, $parse['host'])!==false && strpos($lien, "?share=")===false) {
+                $toc->addToc($libelle, $lien);
             }
         }
         $toc->illustration = $illustration;
@@ -316,13 +310,11 @@ class Scraper
         return tidy_get_output($tidy);
     }
 
-    public static function ReadURLContent($url,$cacheDir=""):string
+    public static function ReadURLContent($url, $cacheDir = ""):string
     {
-        if(!empty($cacheDir))
-        {
-            $content = self::getCache($url,$cacheDir);
-            if(!empty($content))
-            {
+        if (!empty($cacheDir)) {
+            $content = self::getCache($url, $cacheDir);
+            if (!empty($content)) {
                 return $content;
             }
         }
@@ -334,25 +326,20 @@ class Scraper
         $content = curl_exec($ch);
         curl_close($ch);
         $content = self::TidyHTML($content);
-        if(!empty($cacheDir))
-        {
-            self::storeScrape($url,$content,$cacheDir);
+        if (!empty($cacheDir)) {
+            self::storeScrape($url, $content, $cacheDir);
         }
         return $content;
     }
 
-    public static function getCache($url,$cacheDir)
+    public static function getCache($url, $cacheDir)
     {
         $hash = md5($url);
         $filename = $cacheDir."/".$hash;
-        if(file_exists($filename))
-        {
+        if (file_exists($filename)) {
             return file_get_contents($filename);
-        }
-        else
-        {
+        } else {
             return "";
         }
     }
-
 }
