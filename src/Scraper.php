@@ -258,12 +258,9 @@ class Scraper
             $entry->parentNode->removeChild($entry);
         }
         // Sélectionner et supprimer les paragraphes contenant des liens à l'intérieur de .entry-content
-        $links = $xpath->query("//".$locationToc."//div[contains(@class, '".$locationContent."')]//a");
-        foreach ($links as $link) {
-            $parent = $link->closest('p');
-            if ($parent !== null) {
-                $parent->parentNode->removeChild($parent);
-            }
+        $links = $xpath->query("//".$locationToc."//div[contains(@class, '".$locationContent."')]//a//parent::p");
+        foreach ($entries as $entry) {
+            $entry->parentNode->removeChild($entry);
         }
         $description = $doc->saveHTML();
         return $description;
