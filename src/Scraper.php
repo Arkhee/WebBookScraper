@@ -262,7 +262,9 @@ class Scraper
         foreach ($entries as $entry) {
             $entry->parentNode->removeChild($entry);
         }
-        $description = $doc->saveHTML();
+
+        $entry_content_div = $xpath->query("//".$locationToc."//div[contains(@class, '".$locationContent."')]");
+        $description = $doc->saveHTML($entry_content_div[0]);
         return $description;
     }
 
