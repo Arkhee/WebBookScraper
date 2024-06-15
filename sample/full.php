@@ -42,23 +42,33 @@ if(isset($_GET["url"]))
         <script>
             function submitForm()
             {
-                document.getElementById("submitMessages").innerHTML = "Getting book chapter per chapter ...";
-                hideForm();
+                toggleLoading();
+                toggleForm();
                 return true;
             }
             function setMessage(message)
             {
                 document.getElementById("submitMessages").innerHTML = message;
             }
-            function hideForm()
+            function toggleLoading()
             {
-                document.getElementById("formSubmitEpub").style.display = "none";
+                if(document.getElementById("loading").style.display == "block")
+                    document.getElementById("loading").style.display = "none";
+                else
+                    document.getElementById("loading").style.display = "block";
+            }
+            function toggleForm()
+            {
+                if(document.getElementById("formSubmitEpub").style.display == "none")
+                    document.getElementById("formSubmitEpub").style.display = "block";
+                else
+                    document.getElementById("formSubmitEpub").style.display = "none";
             }
             function stopProcess()
             {
                 document.getElementById("loading").style.display = "none";
                 document.getElementById("formSubmitEpub").style.display = "block";
-                document.getElementById("submitMessages").innerHTML = "Process stopped.";
+                document.getElementById("submitMessages").innerHTML = "";
                 document.getElementById("frameEpub").location="";
             }
         </script>
@@ -75,5 +85,21 @@ if(isset($_GET["url"]))
     </div>
     <div id="submitMessages"></div>
     <iframe name="frameEpub" id="frameEpub" style="display:none;"></iframe>
+    <?php
+    $books = WebBookScraper::getAllBooksInfo(__DIR__.'/cache');
+    if(count($books))
+    {
+        echo "<h2>Already requested books</h2>";
+        echo "<ul>";
+        foreach($books as $book)
+        {
+            echo "<li>
+                <a href='index.php?url=".$book["url"]."'>".$book["title"]." (get ePub)</a><br />
+                <a href='".$book["url"]."' target='_blank'>".$book["url"]."</a> 
+            </li>";
+        }
+        echo "</ul>";
+    }
+    ?>
     </body>
     </html>
