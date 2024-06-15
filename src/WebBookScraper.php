@@ -325,9 +325,10 @@ class WebBookScraper
         $this->batchSizeActive = $active;
     }
 
-    private function countFilesInCache($cacheDir)
+    private function countFilesInCache($cacheDir):int
     {
         $nbFiles = count(glob($cacheDir."*"));
+        return $nbFiles;
     }
 
     public function getBook()
