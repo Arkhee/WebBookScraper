@@ -345,7 +345,7 @@ class WebBookScraper
         }
         $end = microtime(true);
         $this->addLog("Main page",$this->url,$end-$begin);
-        $countChapter = 1;
+        $countChapter = 0;
         foreach($this->cover->toc as $index => $toc)
         {
             $begin = microtime(true);
