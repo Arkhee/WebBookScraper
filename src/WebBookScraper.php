@@ -350,8 +350,11 @@ class WebBookScraper
             $begin = microtime(true);
             try
             {
+                if(!$this->isFileInCache($toc->url))
+                {
+                    $countChapter ++;
+                }
                 $this->chapters[] = $this->getContent('Chapter',$toc->url); //Scraper::Chapter($toc->url);
-                $countChapter ++;
                 if($this->cacheActive && $this->batchSizeActive && $countChapter >= $this->batchSize)
                 {
                     // If cache active only AND batch size active, redirect to the same page to continue scraping
@@ -367,6 +370,12 @@ class WebBookScraper
             $this->addLog("Chapter ".($index+1)." on ".count($this->cover->toc),$toc->url,$end-$begin);
         }
     }
+
+    public function isFileInCache($url)
+    {
+        return $this->cacheDir.md5($url);
+    }
+
 
     /**
      * @param $url
