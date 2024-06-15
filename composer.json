@@ -4,7 +4,12 @@
   "license" : "GPL-3.0-or-later",
   "homepage": "https://github.com/Arkhee/WebBookScraper",
   "require": {
-    "php": "^8"
+    "php": "^8",
+    "ext-dom": "Manage HTML Dom content",
+    "ext-mbstring": "string Conversion library",
+    "ext-libxml": "Handle xHtml files",
+    "ext-tidy": "Clean up HTML content",
+    "ext-curl": "Read remote content"
   },
   "authors": [
     {
@@ -15,11 +20,6 @@
     }
   ],
   "suggest": {
-    "ext-dom": "Manage HTML Dom content",
-    "ext-mbstring": "string Conversion library",
-    "ext-libxml": "Handle xHtml files",
-    "ext-tidy": "Clean up HTML content",
-    "ext-curl": "Read remote content"
   },
   "autoload": {
     "psr-4": {

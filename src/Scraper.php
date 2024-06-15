@@ -8,8 +8,10 @@ class Scraper
     public static function Toc($url,$cacheDir=""):StructCover
     {
         $html = self::ReadURLContent($url,$cacheDir);
+        $description = self::ExtractDescriptionInformation($html);
         $xpath = self::CleanTocHTML($html,$cacheDir);
         $toc = self::ExtractTocInformations($xpath,$url);
+        $toc->description = $description;
         return $toc;
     }
 
@@ -228,6 +230,43 @@ class Scraper
         $entryContentNode = $xpath->query('//div[contains(@class, "'.$locationContent.'")]')->item(0);
         $entryContent = $dom->saveHTML($entryContentNode);
         return $xpath;
+    }
+
+    public static function ExtractDescriptionInformation(string $html) : string
+    {
+        $locationToc = WebBookScraper::getScrapePathTocMain();
+        $locationHeader = WebBookScraper::getScrapePathTocHeader();
+        $locationContent = WebBookScraper::getScrapePathTocContent();
+
+
+        $doc = new \DOMDocument();
+        @$doc->loadHTML($html);
+        $xpath = new \DOMXPath($doc);
+
+        $description = "";
+        /*
+        Do the equivalent of the following jQuery lines but with xpath :
+        jQuery(".entry-content script,.entry-content > div, .entry-content br").remove();
+        jQuery(".entry-content a").closest("p").remove()
+        */
+        // Sélectionner et supprimer les éléments script, div, br à l'intérieur de .entry-content
+        $entries = $xpath->query(
+            "//".$locationToc."//div[contains(@class, '".$locationContent."')]//script | ".
+            "//".$locationToc."//div[contains(@class, '".$locationContent."')]/div | ".
+            "//".$locationToc."//div[contains(@class, '".$locationContent."')]//br");
+        foreach ($entries as $entry) {
+            $entry->parentNode->removeChild($entry);
+        }
+        // Sélectionner et supprimer les paragraphes contenant des liens à l'intérieur de .entry-content
+        $links = $xpath->query("//".$locationToc."//div[contains(@class, '".$locationContent."')]//a");
+        foreach ($links as $link) {
+            $parent = $link->closest('p');
+            if ($parent !== null) {
+                $parent->parentNode->removeChild($parent);
+            }
+        }
+        $description = $doc->saveHTML();
+        return $description;
     }
 
     public static function ExtractTocInformations(\DOMXPath $xpath,$url):StructCover

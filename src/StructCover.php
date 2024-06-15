@@ -5,6 +5,7 @@ class StructCover
 {
     public $title = "";
     public $author = "";
+    public $description = "";
 
     /**
      * @var StructToc[] $toc
