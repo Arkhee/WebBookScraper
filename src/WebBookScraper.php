@@ -22,6 +22,7 @@ class WebBookScraper
     private $batchSize = 50;
     private $batchCallback = "";
     private $batchSizeActive = false;
+    private $noSpamTimeInterval=0;
 
     private static $scrape_path_toc_main = 'article';
     private static $scrape_path_toc_header = 'header';
@@ -367,6 +368,13 @@ class WebBookScraper
                 $this->addLog("Error on chapter " . ($index + 1) . " : " . $e->getMessage(), $toc->url);
             }
             $end = microtime(true);
+            /*
+             * Wait a bit more before next chapter if there is a nospam interval
+             */
+            if($this->noSpamTimeInterval>0)
+            {
+                usleep($this->noSpamTimeInterval);
+            }
             $this->addLog("Chapter ".($index+1)." on ".count($this->cover->toc),$toc->url,$end-$begin);
         }
     }
@@ -418,6 +426,11 @@ class WebBookScraper
             }
             $this->storeAllBooksInfo($this->cover->title,$this->cover->description);
         }
+    }
+
+    public function setNoSpamTimeInterval(int $milliseconds)
+    {
+        $this->noSpamTimeInterval = $milliseconds;
     }
 
     private function storeAllBooksInfo($title,$description)
