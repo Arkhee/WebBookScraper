@@ -4,7 +4,7 @@ namespace WebBookScraper;
 class Tools
 {
 
-    public function rmDir($dir, $recurse = true)
+    public static function rmDir($dir, $recurse = true)
     {
         $dir=trim($dir);
         if (empty($dir) || $dir=="." || $dir==".." || $dir=="/" || $dir=="//") {

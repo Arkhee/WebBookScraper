@@ -392,7 +392,7 @@ class WebBookScraper
                     }
                 }
             }
-            if (!is_array($books)) {
+            if (!isset($books) || !is_array($books)) {
                 $books=array();
             }
             $bookinfo = array(
